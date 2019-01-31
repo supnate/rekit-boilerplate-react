@@ -1,6 +1,6 @@
 import React from 'react';
 import { shallow } from 'enzyme';
-import configStore from '../src/common/configStore';
+import store from '../src/common/store';
 import Root from '../src/Root';
 
 describe('Root', () => {
@@ -21,7 +21,6 @@ describe('Root', () => {
         { path: '*', component: NotFoundComp },
       ],
     }];
-    const store = configStore();
 
     shallow(
       <Root store={store} routeConfig={routes} />
