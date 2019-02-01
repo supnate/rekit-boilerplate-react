@@ -18,12 +18,9 @@ function postCreate(args) {
   fs.writeFileSync(path.join(prjPath, 'README.md'), '# README\n');
 
   // Remove unnecessary files
-  [
-    '.travis.yml',
-    'yarn.lock',
-    'rekit.md',
-    'LICENSE',
-  ].forEach(file => fs.unlinkSync(path.join(prjPath, file)));
+  ['.travis.yml', 'yarn.lock', 'rekit.md', 'LICENSE']
+    .map(f => path.join(prjPath, f))
+    .forEach(file => fs.existsSync(file) && fs.unlinkSync(file));
 
   // Clean package.json
   const pkgJson = require(pkgJsonPath); // eslint-disable-line
@@ -41,9 +38,10 @@ function handleSassArgument(args) {
     delete pkgJson.dependencies['less-loader'];
 
     pkgJson.rekit.css = 'sass';
-
+  } else {
+    delete pkgJson.dependencies['sass-loader'];
     // Use webpack sass-loader
-    ['config/webpack.config.dev.js', 'config/webpack.config.prod.js'].forEach(configFile => {
+    ['config/webpack.config.js'].forEach(configFile => {
       const configPath = path.join(prjPath, configFile);
       let text = fs.readFileSync(configPath).toString();
       text = text.replace(/\.less/g, '.scss').replace(/less-loader/g, 'sass-loader');
@@ -51,24 +49,23 @@ function handleSassArgument(args) {
     });
 
     // Rename appStyleIndex in config/paths.js
-    const pathsPath = path.join(prjPath, 'config/paths.js');    
+    const pathsPath = path.join(prjPath, 'config/paths.js');
     let text = fs.readFileSync(pathsPath).toString();
     text = text.replace("'src/styles/index.less'", "'src/styles/index.scss'");
     fs.writeFileSync(pathsPath, text);
 
-    // Rename files extension to 'scss'
-    ['src/features/home', 'src/features/examples', 'src/features/common', 'src/styles'].forEach((folder) => {
-      const fullFolderPath = path.join(prjPath, folder);
-      fs.readdirSync(fullFolderPath).forEach((file) => {
-        if (/\.less$/.test(file)) {
-          const fullFilePath = path.join(fullFolderPath, file);
-          fs.renameSync(fullFilePath, fullFilePath.replace(/less$/, 'scss'));
-        }
-      });
-    });
-  } else {
-    delete pkgJson.dependencies['node-sass-chokidar'];
-    delete pkgJson.dependencies['sass-loader'];
+    // Rename files extension to 'less'
+    ['src/features/home', 'src/features/examples', 'src/features/common', 'src/styles'].forEach(
+      folder => {
+        const fullFolderPath = path.join(prjPath, folder);
+        fs.readdirSync(fullFolderPath).forEach(file => {
+          if (/\.less$/.test(file)) {
+            const fullFilePath = path.join(fullFolderPath, file);
+            fs.renameSync(fullFilePath, fullFilePath.replace(/less$/, 'scss'));
+          }
+        });
+      },
+    );
   }
   fs.writeFileSync(pkgJsonPath, JSON.stringify(pkgJson, null, '  '));
 }
