@@ -36,32 +36,41 @@ function handleSassArgument(args) {
     // Update package.json dependencies
     delete pkgJson.dependencies['less']; // eslint-disable-line
     delete pkgJson.dependencies['less-loader'];
-
-    pkgJson.rekit.css = 'sass';
   } else {
     delete pkgJson.dependencies['sass-loader'];
+    delete pkgJson.dependencies['node-sass-chokidar'];
     // Use webpack sass-loader
-    ['config/webpack.config.js'].forEach(configFile => {
-      const configPath = path.join(prjPath, configFile);
-      let text = fs.readFileSync(configPath).toString();
-      text = text.replace(/\.less/g, '.scss').replace(/less-loader/g, 'sass-loader');
-      fs.writeFileSync(configPath, text);
-    });
 
-    // Rename appStyleIndex in config/paths.js
-    const pathsPath = path.join(prjPath, 'config/paths.js');
-    let text = fs.readFileSync(pathsPath).toString();
-    text = text.replace("'src/styles/index.less'", "'src/styles/index.scss'");
-    fs.writeFileSync(pathsPath, text);
+    const configPath = path.join(prjPath, 'config/webpack.config.js');
+    const text = fs
+      .readFileSync(configPath)
+      .toString()
+      .replace(/\.less/g, '.scss')
+      .replace(/less-loader/g, 'sass-loader')
+      .replace('const sassRegex = /\\.(scss|sass)$/', 'const lessRegex = /\\.less$/')
+      .replace(
+        'const sassModuleRegex = /\\.module\\.(scss|sass)$/',
+        'const lessModuleRegex = /\\.module\\.less$/',
+      )
+      .replace(/sassRegex/g, 'lessRegex')
+      .replace(/lessModuleRegex/g, 'lessModuleRegex')
+      .replace(/sass-loader/g, 'less-loader');
+    fs.writeFileSync(configPath, text);
+
+    // Rename css to less in rekit config
+    const rekitConfigPath = path.join(prjPath, '.rekit');
+    const rekitConfig = JSON.parse(fs.readFileSync(rekitConfigPath));
+    rekitConfig.css = 'less';
+    fs.writeFileSync(rekitConfigPath, JSON.stringify(rekitConfig, null, '  '));
 
     // Rename files extension to 'less'
     ['src/features/home', 'src/features/examples', 'src/features/common', 'src/styles'].forEach(
       folder => {
         const fullFolderPath = path.join(prjPath, folder);
         fs.readdirSync(fullFolderPath).forEach(file => {
-          if (/\.less$/.test(file)) {
+          if (/\.scss$/.test(file)) {
             const fullFilePath = path.join(fullFolderPath, file);
-            fs.renameSync(fullFilePath, fullFilePath.replace(/less$/, 'scss'));
+            fs.renameSync(fullFilePath, fullFilePath.replace(/scss$/, 'less'));
           }
         });
       },
