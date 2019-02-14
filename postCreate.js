@@ -63,6 +63,14 @@ function handleSassArgument(args) {
     rekitConfig.css = 'less';
     fs.writeFileSync(rekitConfigPath, JSON.stringify(rekitConfig, null, '  '));
 
+    // Rename .scss to .less in src/index.js
+    const indexJsPath = path.join(prjPath, 'src/index.js');
+    const newContent = fs
+      .readFileSync(indexJsPath)
+      .toString()
+      .replace("import './styles/index.scss';", "import './styles/index.less';");
+    fs.writeFileSync(indexJsPath, newContent);
+
     // Rename files extension to 'less'
     ['src/features/home', 'src/features/examples', 'src/features/common', 'src/styles'].forEach(
       folder => {
