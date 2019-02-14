@@ -53,7 +53,7 @@ function handleSassArgument(args) {
         'const lessModuleRegex = /\\.module\\.less$/',
       )
       .replace(/sassRegex/g, 'lessRegex')
-      .replace(/lessModuleRegex/g, 'lessModuleRegex')
+      .replace(/sassModuleRegex/g, 'lessModuleRegex')
       .replace(/sass-loader/g, 'less-loader');
     fs.writeFileSync(configPath, text);
 
