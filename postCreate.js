@@ -24,6 +24,7 @@ function postCreate(args) {
 
   // Clean package.json
   const pkgJson = require(pkgJsonPath); // eslint-disable-line
+  pkgJson.name = args.name;
   delete pkgJson.dependencies['codecov']; // eslint-disable-line
   delete pkgJson.scripts['codecov']; // eslint-disable-line
   fs.writeFileSync(pkgJsonPath, JSON.stringify(pkgJson, null, '  '));
