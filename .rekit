@@ -1,3 +1,15 @@
 {
+  "version": "1.0.0",
+  "devPort": 6075,
+  "appType": "rekit-react",
+  "plugins": [],
+  "folders": [
+    "public",
+    "scripts"
+  ],
+  "files": [
+    "package.json",
+    ".rekit"
+  ],
   "css": "sass"
 }
