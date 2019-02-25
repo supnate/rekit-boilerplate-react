@@ -59,7 +59,7 @@ function handleSassArgument(args) {
     fs.writeFileSync(configPath, text);
 
     // Rename css to less in rekit config
-    const rekitConfigPath = path.join(prjPath, '.rekit');
+    const rekitConfigPath = path.join(prjPath, 'rekit.json');
     const rekitConfig = JSON.parse(fs.readFileSync(rekitConfigPath));
     rekitConfig.css = 'less';
     fs.writeFileSync(rekitConfigPath, JSON.stringify(rekitConfig, null, '  '));

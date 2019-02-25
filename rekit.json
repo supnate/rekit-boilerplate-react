@@ -9,7 +9,7 @@
   ],
   "files": [
     "package.json",
-    ".rekit"
+    "rekit.json"
   ],
   "css": "sass"
 }
